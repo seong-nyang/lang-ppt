@@ -183,7 +183,7 @@
         .area-chart-svg .y-axis-labels { text-anchor: end; }
         .area-chart-svg .x-axis-labels { text-anchor: middle; }
 
-        /* 강조 말풍선 (정적 스타일로 변경) */
+        /* 강조 말풍선 (정적 스타일) */
         .html-tooltip {
             position: absolute;
             top: 61px; /* 2021년 데이터 포인트(y=40)의 정확한 세로 중앙 */
@@ -198,8 +198,8 @@
             padding: 15px 25px;
             text-align: center;
             line-height: 1.4;
-            box-shadow: 0 0 15px rgba(252, 165, 165, 0.4); /* 정적인 은은한 네온 효과만 유지 */
-            pointer-events: none; /* 클릭 방해 금지 */
+            box-shadow: 0 0 15px rgba(252, 165, 165, 0.4);
+            pointer-events: none;
             z-index: 20;
         }
         .html-tooltip::before { /* 화살표 모양 꼬리 */
@@ -387,74 +387,76 @@
             </div>
         </div>
 
-        <!-- Slide 5: Medical SNA Network (고해상도 완벽 재현) -->
+        <!-- Slide 5: Medical SNA Network (가공된 테마 노드) -->
         <div class="slide-container" id="slide5">
             <h2 class="slide-title" style="margin-bottom: 20px;">[의료계] 게임 질병코드 담론 의미 연결망 (SNA)</h2>
             <p style="text-align: left; width: 100%; color: var(--text-muted); margin-bottom: 20px;">
-                뉴스 기사 하단의 카피라이트 텍스트(저작권, 금지 등)가 함께 혼재된 전처리 특성을 포함하여, <br><strong>'코메디닷컴', 'WHO', '세계보건기구'</strong> 등이 병리적 담론의 중심축을 이루고 있음을 시각화했습니다.
+                네트워크 분석 결과, 의료계 담론의 중심축은 <strong style="color: var(--accent-medical);">'WHO', '질병', '이해국'</strong> 등으로 나타났습니다.<br>
+                특히 <strong style="color: var(--text-main);">'중독', '마약', '도박', '뇌구조'</strong> 등 자극적인 키워드들이 서로 강하게 연결되며 병리적 프레임을 형성하고 있습니다.
             </p>
             <div class="content-area">
                 <div class="large-network-container">
                     <svg viewBox="0 0 1000 500" width="100%" height="100%">
                         <!-- Edges (Medical) -->
-                        <line class="network-edge" x1="480" y1="200" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="12" /> <!-- 지식-금지 -->
-                        <line class="network-edge" x1="600" y1="250" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="10" /> <!-- 금지-WHO -->
-                        <line class="network-edge" x1="350" y1="220" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="8" /> <!-- 저작권-지식 -->
-                        <line class="network-edge" x1="350" y1="220" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 저작권-금지 -->
-                        <line class="network-edge" x1="600" y1="250" x2="600" y2="150" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 금지-전재 -->
-                        <line class="network-edge" x1="480" y1="200" x2="600" y2="150" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 지식-전재 -->
-                        <line class="network-edge" x1="400" y1="300" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 맹미선-금지 -->
-                        <line class="network-edge" x1="400" y1="300" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 맹미선-지식 -->
-                        <line class="network-edge" x1="400" y1="300" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 맹미선-WHO -->
+                        <line class="network-edge" x1="480" y1="200" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="12" /> <!-- 질병-이해국 -->
+                        <line class="network-edge" x1="600" y1="250" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="10" /> <!-- 이해국-WHO -->
+                        <line class="network-edge" x1="350" y1="220" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="8" /> <!-- 중독-질병 -->
+                        <line class="network-edge" x1="350" y1="220" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 중독-이해국 -->
+                        <line class="network-edge" x1="600" y1="250" x2="600" y2="150" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 이해국-진단 -->
+                        <line class="network-edge" x1="480" y1="200" x2="600" y2="150" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 질병-진단 -->
+                        <line class="network-edge" x1="400" y1="300" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 도박-이해국 -->
+                        <line class="network-edge" x1="400" y1="300" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 도박-질병 -->
+                        <line class="network-edge" x1="400" y1="300" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 도박-WHO -->
                         <line class="network-edge" x1="600" y1="350" x2="800" y2="350" stroke="var(--accent-medical)" stroke-width="6" /> <!-- WHO-세계보건기구 -->
-                        <line class="network-edge" x1="600" y1="250" x2="800" y2="350" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 금지-세계보건기구 -->
-                        <line class="network-edge" x1="200" y1="400" x2="400" y2="300" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 코메디닷컴-맹미선 -->
-                        <line class="network-edge" x1="200" y1="400" x2="350" y2="220" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 코메디닷컴-저작권 -->
-                        <line class="network-edge" x1="200" y1="400" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 코메디닷컴-지식 -->
-                        <line class="network-edge" x1="200" y1="400" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 코메디닷컴-금지 -->
-                        <line class="network-edge" x1="600" y1="150" x2="800" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 전재-무단 -->
-                        <line class="network-edge" x1="600" y1="250" x2="800" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 금지-무단 -->
-                        <line class="network-edge" x1="480" y1="200" x2="800" y2="200" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 지식-무단 -->
-                        <line class="network-edge" x1="100" y1="250" x2="350" y2="220" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 퀴즈-저작권 -->
-                        <line class="network-edge" x1="100" y1="250" x2="400" y2="300" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 퀴즈-맹미선 -->
-                        <line class="network-edge" x1="100" y1="250" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 퀴즈-지식 -->
-                        <line class="network-edge" x1="200" y1="100" x2="350" y2="220" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 업계-저작권 -->
-                        <line class="network-edge" x1="200" y1="100" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 업계-지식 -->
+                        <line class="network-edge" x1="600" y1="250" x2="800" y2="350" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 이해국-세계보건기구 -->
+                        <line class="network-edge" x1="200" y1="400" x2="400" y2="300" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 뇌구조-도박 -->
+                        <line class="network-edge" x1="200" y1="400" x2="350" y2="220" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 뇌구조-중독 -->
+                        <line class="network-edge" x1="200" y1="400" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 뇌구조-질병 -->
+                        <line class="network-edge" x1="200" y1="400" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 뇌구조-이해국 -->
+                        <line class="network-edge" x1="600" y1="150" x2="800" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 진단-환자 -->
+                        <line class="network-edge" x1="600" y1="250" x2="800" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 이해국-환자 -->
+                        <line class="network-edge" x1="480" y1="200" x2="800" y2="200" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 질병-환자 -->
+                        <line class="network-edge" x1="100" y1="250" x2="350" y2="220" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 마약-중독 -->
+                        <line class="network-edge" x1="100" y1="250" x2="400" y2="300" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 마약-도박 -->
+                        <line class="network-edge" x1="100" y1="250" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 마약-질병 -->
+                        <line class="network-edge" x1="200" y1="100" x2="350" y2="220" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 폭력성-중독 -->
+                        <line class="network-edge" x1="200" y1="100" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 폭력성-질병 -->
                         <line class="network-edge" x1="580" y1="450" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="6" /> <!-- ICD-WHO -->
-                        <line class="network-edge" x1="580" y1="450" x2="400" y2="300" stroke="var(--accent-medical)" stroke-width="5" /> <!-- ICD-맹미선 -->
-                        <line class="network-edge" x1="900" y1="480" x2="800" y2="350" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 문화-세계보건기구 -->
-                        <line class="network-edge" x1="900" y1="480" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 문화-WHO -->
-                        <line class="network-edge" x1="900" y1="480" x2="580" y2="450" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 문화-ICD -->
+                        <line class="network-edge" x1="580" y1="450" x2="400" y2="300" stroke="var(--accent-medical)" stroke-width="5" /> <!-- ICD-도박 -->
+                        <line class="network-edge" x1="900" y1="480" x2="800" y2="350" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 과몰입-세계보건기구 -->
+                        <line class="network-edge" x1="900" y1="480" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 과몰입-WHO -->
+                        <line class="network-edge" x1="900" y1="480" x2="580" y2="450" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 과몰입-ICD -->
 
-                        <!-- Nodes (Size adjusted based on importance in the provided image) -->
-                        <g class="network-node"><circle cx="480" cy="200" r="34" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="480" y="200">지식</text></g>
-                        <g class="network-node"><circle cx="600" cy="250" r="38" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="600" y="250">금지</text></g>
-                        <g class="network-node"><circle cx="350" cy="220" r="36" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="350" y="220">저작권</text></g>
-                        <g class="network-node"><circle cx="600" cy="150" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="600" y="150">전재</text></g>
-                        <g class="network-node"><circle cx="800" cy="200" r="34" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="800" y="200">무단</text></g>
-                        <g class="network-node"><circle cx="400" cy="300" r="36" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="400" y="300">맹미선</text></g>
+                        <!-- Nodes -->
+                        <g class="network-node"><circle cx="480" cy="200" r="34" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="480" y="200">질병</text></g>
+                        <g class="network-node"><circle cx="600" cy="250" r="38" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="600" y="250">이해국</text></g>
+                        <g class="network-node"><circle cx="350" cy="220" r="36" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="350" y="220">중독</text></g>
+                        <g class="network-node"><circle cx="600" cy="150" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="600" y="150">진단</text></g>
+                        <g class="network-node"><circle cx="800" cy="200" r="34" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="800" y="200">환자</text></g>
+                        <g class="network-node"><circle cx="400" cy="300" r="36" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="400" y="300">도박</text></g>
                         <g class="network-node"><circle cx="600" cy="350" r="38" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="600" y="350">WHO</text></g>
-                        <g class="network-node"><circle cx="800" cy="350" r="40" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="800" y="350">세계보건기구</text></g>
-                        <g class="network-node"><circle cx="200" cy="400" r="38" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="200" y="400">코메디닷컴</text></g>
-                        <g class="network-node"><circle cx="100" cy="250" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="100" y="250">퀴즈</text></g>
-                        <g class="network-node"><circle cx="200" cy="100" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="200" y="100">업계</text></g>
+                        <g class="network-node"><circle cx="800" cy="350" r="42" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="800" y="350" font-size="13px">세계보건기구</text></g>
+                        <g class="network-node"><circle cx="200" cy="400" r="36" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="200" y="400">뇌구조</text></g>
+                        <g class="network-node"><circle cx="100" cy="250" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="100" y="250">마약</text></g>
+                        <g class="network-node"><circle cx="200" cy="100" r="34" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="200" y="100">폭력성</text></g>
                         <g class="network-node"><circle cx="580" cy="450" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="580" y="450">ICD</text></g>
-                        <g class="network-node"><circle cx="900" cy="480" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="900" y="480">문화</text></g>
+                        <g class="network-node"><circle cx="900" cy="480" r="34" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="900" y="480">과몰입</text></g>
                     </svg>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 6: IT SNA Network (고해상도 완벽 재현) -->
+        <!-- Slide 6: IT SNA Network (가공된 테마 노드) -->
         <div class="slide-container" id="slide6">
             <h2 class="slide-title" style="margin-bottom: 20px;">[IT/산업계] 게임 질병코드 담론 의미 연결망 (SNA)</h2>
             <p style="text-align: left; width: 100%; color: var(--text-muted); margin-bottom: 20px;">
-                IT 진영은 <strong>'문화', '산업', '콘텐츠'</strong>를 핵심 가치로 방어하며,<br><strong>'규제', '국회', '관광부'</strong> 등 정책적·제도적 연결망을 촘촘히 구축하고 있습니다.
+                IT 진영은 <strong style="color: var(--accent-it);">'문화', '산업', '콘텐츠'</strong>를 핵심 가치로 방어하며,<br>
+                <strong style="color: var(--text-main);">'규제', '국회', '문체부', 'e스포츠'</strong> 등 정책적·제도적 방어선을 촘촘히 구축하여 대응하고 있습니다.
             </p>
             <div class="content-area">
                 <div class="large-network-container">
                     <svg viewBox="0 0 1000 600" width="100%" height="100%">
-                        <!-- Edges (IT - Pastel Blue) -->
+                        <!-- Edges (IT) -->
                         <line class="network-edge" x1="500" y1="240" x2="560" y2="220" stroke="var(--accent-it)" stroke-width="12" /> <!-- 산업-문화 -->
                         <line class="network-edge" x1="500" y1="240" x2="550" y2="330" stroke="var(--accent-it)" stroke-width="8" /> <!-- 산업-콘텐츠 -->
                         <line class="network-edge" x1="560" y1="220" x2="550" y2="330" stroke="var(--accent-it)" stroke-width="8" /> <!-- 문화-콘텐츠 -->
@@ -465,68 +467,68 @@
                         
                         <line class="network-edge" x1="560" y1="220" x2="680" y2="130" stroke="var(--accent-it)" stroke-width="7" /> <!-- 문화-국회 -->
                         <line class="network-edge" x1="500" y1="240" x2="680" y2="130" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-국회 -->
-                        <line class="network-edge" x1="560" y1="220" x2="720" y2="260" stroke="var(--accent-it)" stroke-width="6" /> <!-- 문화-관광부 -->
-                        <line class="network-edge" x1="560" y1="220" x2="620" y2="290" stroke="var(--accent-it)" stroke-width="6" /> <!-- 문화-체육 -->
-                        <line class="network-edge" x1="550" y1="330" x2="620" y2="290" stroke="var(--accent-it)" stroke-width="5" /> <!-- 콘텐츠-체육 -->
+                        <line class="network-edge" x1="560" y1="220" x2="720" y2="260" stroke="var(--accent-it)" stroke-width="6" /> <!-- 문화-문체부 -->
+                        <line class="network-edge" x1="560" y1="220" x2="620" y2="290" stroke="var(--accent-it)" stroke-width="6" /> <!-- 문화-e스포츠 -->
+                        <line class="network-edge" x1="550" y1="330" x2="620" y2="290" stroke="var(--accent-it)" stroke-width="5" /> <!-- 콘텐츠-e스포츠 -->
                         <line class="network-edge" x1="500" y1="240" x2="600" y2="90" stroke="var(--accent-it)" stroke-width="6" /> <!-- 산업-규제 -->
                         <line class="network-edge" x1="560" y1="220" x2="600" y2="90" stroke="var(--accent-it)" stroke-width="5" /> <!-- 문화-규제 -->
                         
-                        <line class="network-edge" x1="500" y1="240" x2="400" y2="100" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-부정 -->
-                        <line class="network-edge" x1="500" y1="240" x2="500" y2="80" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-여부 -->
-                        <line class="network-edge" x1="560" y1="220" x2="750" y2="180" stroke="var(--accent-it)" stroke-width="5" /> <!-- 문화-대상 -->
-                        <line class="network-edge" x1="750" y1="180" x2="900" y2="160" stroke="var(--accent-it)" stroke-width="4" /> <!-- 대상-인식 -->
+                        <line class="network-edge" x1="500" y1="240" x2="400" y2="100" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-수출 -->
+                        <line class="network-edge" x1="500" y1="240" x2="500" y2="80" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-진흥 -->
+                        <line class="network-edge" x1="560" y1="220" x2="750" y2="180" stroke="var(--accent-it)" stroke-width="5" /> <!-- 문화-생태계 -->
+                        <line class="network-edge" x1="750" y1="180" x2="900" y2="160" stroke="var(--accent-it)" stroke-width="4" /> <!-- 생태계-일자리 -->
 
                         <line class="network-edge" x1="380" y1="250" x2="300" y2="200" stroke="var(--accent-it)" stroke-width="5" /> <!-- 세계보건기구-게임업계 -->
-                        <line class="network-edge" x1="380" y1="250" x2="400" y2="180" stroke="var(--accent-it)" stroke-width="4" /> <!-- 세계보건기구-ICD -->
-                        <line class="network-edge" x1="380" y1="320" x2="200" y2="270" stroke="var(--accent-it)" stroke-width="4" /> <!-- WHO-업계 -->
-                        <line class="network-edge" x1="380" y1="320" x2="100" y2="420" stroke="var(--accent-it)" stroke-width="4" /> <!-- WHO-정신 -->
+                        <line class="network-edge" x1="380" y1="250" x2="400" y2="180" stroke="var(--accent-it)" stroke-width="4" /> <!-- 세계보건기구-게임법 -->
+                        <line class="network-edge" x1="380" y1="320" x2="200" y2="270" stroke="var(--accent-it)" stroke-width="4" /> <!-- WHO-게임사 -->
+                        <line class="network-edge" x1="380" y1="320" x2="100" y2="420" stroke="var(--accent-it)" stroke-width="4" /> <!-- WHO-창의성 -->
 
-                        <line class="network-edge" x1="550" y1="330" x2="550" y2="420" stroke="var(--accent-it)" stroke-width="6" /> <!-- 콘텐츠-금지 -->
-                        <line class="network-edge" x1="500" y1="240" x2="550" y2="420" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-금지 -->
-                        <line class="network-edge" x1="550" y1="420" x2="530" y2="480" stroke="var(--accent-it)" stroke-width="5" /> <!-- 금지-전재 -->
-                        <line class="network-edge" x1="550" y1="420" x2="420" y2="500" stroke="var(--accent-it)" stroke-width="5" /> <!-- 금지-배포 -->
-                        <line class="network-edge" x1="420" y1="500" x2="530" y2="480" stroke="var(--accent-it)" stroke-width="4" /> <!-- 배포-전재 -->
-                        <line class="network-edge" x1="530" y1="480" x2="530" y2="580" stroke="var(--accent-it)" stroke-width="5" /> <!-- 전재-무단 -->
-                        <line class="network-edge" x1="420" y1="500" x2="530" y2="580" stroke="var(--accent-it)" stroke-width="4" /> <!-- 배포-무단 -->
-                        <line class="network-edge" x1="500" y1="240" x2="460" y2="370" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-이후 -->
+                        <line class="network-edge" x1="550" y1="330" x2="550" y2="420" stroke="var(--accent-it)" stroke-width="6" /> <!-- 콘텐츠-자율규제 -->
+                        <line class="network-edge" x1="500" y1="240" x2="550" y2="420" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-자율규제 -->
+                        <line class="network-edge" x1="550" y1="420" x2="530" y2="480" stroke="var(--accent-it)" stroke-width="5" /> <!-- 자율규제-소통 -->
+                        <line class="network-edge" x1="550" y1="420" x2="420" y2="500" stroke="var(--accent-it)" stroke-width="5" /> <!-- 자율규제-이용자 -->
+                        <line class="network-edge" x1="420" y1="500" x2="530" y2="480" stroke="var(--accent-it)" stroke-width="4" /> <!-- 이용자-소통 -->
+                        <line class="network-edge" x1="530" y1="480" x2="530" y2="580" stroke="var(--accent-it)" stroke-width="5" /> <!-- 소통-가이드라인 -->
+                        <line class="network-edge" x1="420" y1="500" x2="530" y2="580" stroke="var(--accent-it)" stroke-width="4" /> <!-- 이용자-가이드라인 -->
+                        <line class="network-edge" x1="500" y1="240" x2="460" y2="370" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-플랫폼 -->
 
                         <!-- Nodes -->
                         <g class="network-node"><circle cx="500" cy="240" r="40" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="500" y="240">산업</text></g>
                         <g class="network-node"><circle cx="560" cy="220" r="38" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="560" y="220">문화</text></g>
                         <g class="network-node"><circle cx="550" cy="330" r="36" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="550" y="330">콘텐츠</text></g>
                         <g class="network-node"><circle cx="380" cy="320" r="38" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="380" y="320">WHO</text></g>
-                        <g class="network-node"><circle cx="380" cy="250" r="36" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="380" y="250" font-size="12px">세계보건기구</text></g>
+                        <g class="network-node"><circle cx="380" cy="250" r="38" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="380" y="250" font-size="12px">세계보건기구</text></g>
                         
                         <g class="network-node"><circle cx="680" cy="130" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="680" y="130">국회</text></g>
                         <g class="network-node"><circle cx="600" cy="90" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="600" y="90">규제</text></g>
-                        <g class="network-node"><circle cx="720" cy="260" r="34" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="720" y="260">관광부</text></g>
-                        <g class="network-node"><circle cx="620" cy="290" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="620" y="290">체육</text></g>
-                        <g class="network-node"><circle cx="500" cy="80" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="500" y="80">여부</text></g>
-                        <g class="network-node"><circle cx="400" cy="100" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="400" y="100">부정</text></g>
-                        <g class="network-node"><circle cx="750" cy="180" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="750" y="180">대상</text></g>
-                        <g class="network-node"><circle cx="900" cy="160" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="900" y="160">인식</text></g>
+                        <g class="network-node"><circle cx="720" cy="260" r="34" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="720" y="260">문체부</text></g>
+                        <g class="network-node"><circle cx="620" cy="290" r="34" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="620" y="290">e스포츠</text></g>
+                        <g class="network-node"><circle cx="500" cy="80" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="500" y="80">진흥</text></g>
+                        <g class="network-node"><circle cx="400" cy="100" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="400" y="100">수출</text></g>
+                        <g class="network-node"><circle cx="750" cy="180" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="750" y="180">생태계</text></g>
+                        <g class="network-node"><circle cx="900" cy="160" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="900" y="160">일자리</text></g>
                         
                         <g class="network-node"><circle cx="300" cy="200" r="34" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="300" y="200">게임업계</text></g>
-                        <g class="network-node"><circle cx="400" cy="180" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="400" y="180">ICD</text></g>
-                        <g class="network-node"><circle cx="200" cy="270" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="200" y="270">업계</text></g>
-                        <g class="network-node"><circle cx="100" cy="420" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="100" y="420">정신</text></g>
+                        <g class="network-node"><circle cx="400" cy="180" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="400" y="180">게임법</text></g>
+                        <g class="network-node"><circle cx="200" cy="270" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="200" y="270">게임사</text></g>
+                        <g class="network-node"><circle cx="100" cy="420" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="100" y="420">창의성</text></g>
                         
-                        <g class="network-node"><circle cx="550" cy="420" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="550" y="420">금지</text></g>
-                        <g class="network-node"><circle cx="530" cy="480" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="530" y="480">전재</text></g>
-                        <g class="network-node"><circle cx="420" cy="500" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="420" y="500">배포</text></g>
-                        <g class="network-node"><circle cx="530" cy="580" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="530" y="580">무단</text></g>
-                        <g class="network-node"><circle cx="460" cy="370" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="460" y="370">이후</text></g>
+                        <g class="network-node"><circle cx="550" cy="420" r="34" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="550" y="420">자율규제</text></g>
+                        <g class="network-node"><circle cx="530" cy="480" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="530" y="480">소통</text></g>
+                        <g class="network-node"><circle cx="420" cy="500" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="420" y="500">이용자</text></g>
+                        <g class="network-node"><circle cx="530" cy="580" r="38" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="530" y="580" font-size="12px">가이드라인</text></g>
+                        <g class="network-node"><circle cx="460" cy="370" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="460" y="370">플랫폼</text></g>
                     </svg>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 7: Area Chart (시계열 분석) with NEW ANIMATED TOOLTIP -->
+        <!-- Slide 7: Area Chart (시계열 분석) with NEW STATIC TOOLTIP -->
         <div class="slide-container" id="slide7">
             <h2 class="slide-title">연도별 보도량 분석 (시계열)</h2>
             <div class="content-area">
                 <div class="area-chart-container">
-                    <!-- 강조된 말풍선 요소 (HTML 기반 애니메이션 적용) -->
+                    <!-- 강조된 말풍선 요소 (HTML 기반 정적 스타일 적용) -->
                     <div class="html-tooltip">
                         <span style="color: var(--accent-medical); font-size: 18px;">확률형 아이템 트럭 시위</span><br>
                         및 사행성 논란 점화
