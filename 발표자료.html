@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!-- 모바일 환경 등에서 화면 자동 축소를 막고 비율을 유지하기 위한 설정 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>게임 질병코드 담론 분석 - 프레젠테이션</title>
+    <!-- Pretendard Font via CDN -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v3.2.1/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 1. CORE VARIABLES */
+        :root {
+            --bg-dark: #0f172a;
+            --bg-darker: #020617;
+            --bg-panel: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-medical: #fca5a5; /* Pastel Red */
+            --accent-it: #93c5fd;      /* Pastel Blue */
+            --accent-neutral: #cbd5e1; /* Pastel Gray */
+        }
+
+        * {
+            box-sizing: border-box;
+            word-break: keep-all; /* 텍스트 세로 잘림 완벽 방지 */
+        }
+
+        p {
+            margin: 0;
+            margin-bottom: 15px;
+        }
+
+        /* 발표 모드 기본 Body: 강제 고정 */
+        body {
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+            font-family: 'Pretendard', sans-serif;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* 외부 뷰어 간섭 차단 및 1280x720 픽셀 강제 락인(Lock-in) */
+        #presentation-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1280px !important;
+            height: 720px !important;
+            transform-origin: top left;
+            background-color: var(--bg-darker);
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            /* 축소 시 요소 찌그러짐 방지 */
+            flex-shrink: 0; 
+        }
+
+        /* 슬라이드 크기도 무조건 고정 */
+        .slide-container {
+            align-items: center;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            display: flex;
+            flex-direction: column;
+            width: 1280px !important;
+            height: 720px !important;
+            justify-content: center;
+            padding: 60px;
+            position: absolute; 
+            top: 0;
+            left: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s;
+            z-index: 1;
+        }
+
+        .slide-container.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+        }
+
+        /* 배경 효과 (흐림 빛) */
+        .slide-container::before,
+        .slide-container::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .slide-container::before {
+            background: var(--accent-medical);
+            width: 600px; height: 600px;
+            top: -200px; left: -100px;
+        }
+        .slide-container::after {
+            background: var(--accent-it);
+            width: 500px; height: 500px;
+            bottom: -150px; right: -50px;
+        }
+        .slide-container > * { position: relative; z-index: 1; }
+
+        /* 2. TYPOGRAPHY */
+        .slide-container h1, .slide-container h2, .slide-container h3, .slide-container h4 {
+            color: var(--text-main); font-weight: 700; margin: 0; letter-spacing: -0.5px;
+        }
+        .slide-container p, .slide-container li, .slide-container th, .slide-container td {
+            color: var(--text-muted); line-height: 1.6; font-size: 20px;
+        }
+        .slide-container h1 { font-size: 56px; line-height: 1.3; }
+        .slide-container h2.slide-title { font-size: 40px; font-weight: 700; margin-bottom: 40px; text-align: left; width: 100%; }
+        .slide-container h3 { font-size: 28px; font-weight: 600; margin-bottom: 15px; }
+        .slide-container .subtitle { font-size: 24px; font-weight: 400; margin: 20px auto; color: var(--text-main); opacity: 0.9; }
+
+        .content-area { display: flex; flex-direction: column; flex-grow: 1; justify-content: center; width: 100%; }
+
+        /* 3. LAYOUTS */
+        .title-layout { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; }
+        .title-layout .author-info { margin-top: 60px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1); width: 60%; }
+        .title-layout .author-info p { font-size: 18px; margin-bottom: 5px; }
+        .title-highlight { background: linear-gradient(90deg, var(--accent-medical), var(--accent-it)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .tiled-content { display: flex; gap: 30px; width: 100%; }
+        .tile { background: var(--bg-panel); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; display: flex; flex-direction: column; flex: 1; padding: 40px 30px; }
+        .tile .icon { font-size: 40px; margin-bottom: 25px; color: var(--text-main); }
+        .tile:nth-child(1) .icon { color: var(--text-muted); }
+        .tile:nth-child(2) .icon { color: var(--accent-medical); }
+        .tile:nth-child(3) .icon { color: var(--accent-it); }
+        .tile p { color: var(--text-main); opacity: 0.8; font-size: 18px; }
+
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; width: 100%; height: 100%; }
+        .two-column.tiled > div { background: var(--bg-panel); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+
+        /* Timeline Layout */
+        .timeline-layout { display: flex; height: 100%; justify-content: space-between; position: relative; width: 100%; align-items: stretch; }
+        .timeline-layout .timeline-line { background-color: rgba(255, 255, 255, 0.1); height: 4px; left: 0; position: absolute; top: 50%; transform: translateY(-2px); width: 100%; z-index: 0; }
+        .timeline-item { position: relative; text-align: center; width: 23%; display: flex; flex-direction: column; justify-content: center; }
+        .timeline-item::after { background-color: var(--bg-darker); border-radius: 50%; border: 4px solid var(--accent-it); content: ''; height: 24px; left: 50%; position: absolute; top: 50%; transform: translate(-50%, -50%); width: 24px; z-index: 1; }
+        .timeline-item .content-wrapper { position: absolute; width: 100%; left: 0; background: var(--bg-panel); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .timeline-item:nth-child(odd) .content-wrapper { bottom: 50%; margin-bottom: 35px; }
+        .timeline-item:nth-child(even) .content-wrapper { margin-top: 35px; top: 50%; }
+        .timeline-item h3 { color: var(--accent-it); font-size: 22px; margin-bottom: 10px; }
+        .timeline-item p { font-size: 16px; margin-bottom: 0; }
+
+        /* Table */
+        .table-layout table { border-collapse: separate; border-spacing: 0; width: 100%; background: rgba(30, 41, 59, 0.4); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; backdrop-filter: blur(12px); }
+        .table-layout th, .table-layout td { padding: 20px 24px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .table-layout th { background-color: rgba(255, 255, 255, 0.05); color: var(--text-main); font-size: 22px; font-weight: 700; }
+        .table-layout td:first-child { font-weight: 700; color: var(--text-main); }
+        .table-layout th:nth-child(2), .table-layout td:nth-child(2) { color: var(--accent-medical); }
+        .table-layout th:nth-child(3), .table-layout td:nth-child(3) { color: var(--accent-it); }
+        .table-layout tr:last-child td { border-bottom: none; }
+
+        /* Stacked Bar */
+        .chart-container { display: flex; flex-direction: column; gap: 40px; width: 100%; padding: 20px 0; }
+        .bar { display: flex; gap: 30px; align-items: center; }
+        .bar .label { color: var(--text-main); flex: 0 0 150px; font-weight: 700; font-size: 24px; text-align: right; }
+        .bar .bar-inner { background-color: rgba(255,255,255,0.05); border-radius: 8px; flex-grow: 1; height: 60px; display: flex; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .bar-segment { display: flex; align-items: center; justify-content: center; color: var(--bg-darker); font-weight: 700; font-size: 18px; }
+        .seg-neg { background-color: var(--accent-medical); }
+        .seg-neu { background-color: var(--accent-neutral); }
+        .seg-pos { background-color: var(--accent-it); }
+        .custom-legend { display: flex; justify-content: center; gap: 40px; margin-top: 20px; }
+        .custom-legend div { display: flex; align-items: center; gap: 10px; color: var(--text-main); font-size: 18px; }
+        .legend-box { width: 20px; height: 20px; border-radius: 4px; }
+
+        /* Area Chart (시계열) */
+        .area-chart-container { padding: 20px; width: 100%; height: 400px; background: var(--bg-panel); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); position: relative; }
+        .area-chart-svg { height: 100%; width: 100%; overflow: visible; }
+        .area-chart-svg .grid { stroke: rgba(255,255,255,0.1); stroke-width: 1; }
+        .area-chart-svg .grid-dash { stroke: rgba(255,255,255,0.1); stroke-width: 1; stroke-dasharray: 4 4; }
+        .area-chart-svg .area-fill { fill: url(#area-gradient); stroke: none; }
+        .area-chart-svg .line-stroke { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4; stroke: var(--accent-it); }
+        .area-chart-svg .data-point { fill: var(--bg-dark); stroke-width: 3; stroke: var(--accent-it); }
+        .area-chart-svg .data-point.highlight { fill: var(--accent-medical); stroke: var(--text-main); r: 8; }
+        .area-chart-svg .axis-labels { fill: var(--text-muted); font-size: 14px; font-family: 'Pretendard', sans-serif; }
+        .area-chart-svg .y-axis-labels { text-anchor: end; }
+        .area-chart-svg .x-axis-labels { text-anchor: middle; }
+
+        /* 강조 말풍선 (정적 스타일로 변경) */
+        .html-tooltip {
+            position: absolute;
+            top: 61px; /* 2021년 데이터 포인트(y=40)의 정확한 세로 중앙 */
+            left: 460px; /* 2021년 데이터 포인트(x=375) 기준 우측 여백에 딱 맞게 정렬 */
+            transform: translateY(-50%); /* 높이와 상관없이 항상 수직 중앙으로 화살표 정렬 */
+            background-color: rgba(30, 41, 59, 0.95);
+            border: 2px solid var(--accent-medical);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 600;
+            padding: 15px 25px;
+            text-align: center;
+            line-height: 1.4;
+            box-shadow: 0 0 15px rgba(252, 165, 165, 0.4); /* 정적인 은은한 네온 효과만 유지 */
+            pointer-events: none; /* 클릭 방해 금지 */
+            z-index: 20;
+        }
+        .html-tooltip::before { /* 화살표 모양 꼬리 */
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -12px;
+            transform: translateY(-50%);
+            border-width: 6px 12px 6px 0;
+            border-style: solid;
+            border-color: transparent var(--accent-medical) transparent transparent;
+        }
+
+        /* Large Network Container */
+        .large-network-container { width: 100%; height: 500px; background: var(--bg-panel); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: center; align-items: center; position: relative; }
+        .network-node circle { stroke-width: 3; }
+        .network-node text { font-family: 'Pretendard', sans-serif; font-size: 15px; font-weight: 700; fill: var(--bg-darker); text-anchor: middle; alignment-baseline: middle; }
+        .network-edge { opacity: 0.35; stroke-linecap: round; }
+
+        /* Q&A Layout */
+        .qa-layout { margin: 0 auto; text-align: center; width: 100%; align-self: center; }
+        .qa-layout h2 { font-size: 80px; margin-bottom: 20px; background: linear-gradient(90deg, var(--accent-medical), var(--accent-it)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .qa-layout p { font-size: 28px; color: var(--text-main); }
+
+        /* 발표 컨트롤러 UI */
+        #presentation-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 1000;
+            opacity: 0; 
+            transition: opacity 0.3s;
+        }
+        body:hover #presentation-controls, #presentation-controls.visible { opacity: 1; }
+        .control-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; outline: none; transition: color 0.2s; }
+        .control-btn:hover { color: var(--accent-it); }
+        .control-btn:disabled { color: rgba(255,255,255,0.2); cursor: not-allowed; }
+        #slide-counter { color: var(--text-main); font-size: 16px; font-weight: bold; min-width: 60px; text-align: center; }
+
+        /* PDF 인쇄 시 설정 (가로 깨짐 완벽 방지) */
+        @media print {
+            body { display: block; overflow: auto; height: auto; background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            #presentation-area { transform: none !important; position: static; width: 1280px !important; height: auto !important; box-shadow: none; background: none; }
+            .slide-container { position: relative; opacity: 1 !important; visibility: visible !important; page-break-after: always; box-shadow: none; margin-bottom: 0; width: 1280px !important; height: 720px !important; }
+            #presentation-controls { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 화면에 꽉 차게 조절되는 캔버스 영역 (찌그러짐 방지 래퍼) -->
+    <div id="presentation-area">
+
+        <!-- Slide 1: Title_Slide -->
+        <div class="slide-container" id="slide1">
+            <div class="title-layout">
+                <h1>게임 질병코드,<br><span class="title-highlight">국민 보건 문제인가 새로운 시장 창출인가?</span></h1>
+                <p class="subtitle">빅데이터와 AI 감성 분석으로 살펴본 언론 담론의 시각차</p>
+                
+                <div class="author-info">
+                    <p>일어일문학과 · <strong>양찬우</strong></p>
+                    <p style="color: var(--text-muted); font-size: 16px;">언어데이터처리분석 프로젝트 <strong>손범기 교수님</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Tiled_Text_With_Icons (연구 배경 및 가설) -->
+        <div class="slide-container" id="slide2">
+            <h2 class="slide-title">연구 배경 및 가설</h2>
+            <div class="content-area">
+                <div class="tiled-content">
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-gamepad"></i></div>
+                        <h3 style="color: var(--text-main);">우리의 게임</h3>
+                        <p>우리가 즐기는 게임은 많은 사람들에게 평범한 일상이자 새로 들어온 놀이 문화입니다.</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-newspaper"></i></div>
+                        <h3 style="color: var(--accent-medical);">언론 담론</h3>
+                        <p>반면, 언론에서는 마약, 도박, 뇌 구조 변화 등 자극적이고 병리적인 접근을 통해 게임의 위험성을 강하게 제기합니다.</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-scale-unbalanced"></i></div>
+                        <h3 style="color: var(--accent-it);">문제 제기</h3>
+                        <p>이러한 거대한 담론의 괴리가 <strong>치료</strong>라는 명분 이면에 새로운 의료 시장을 개척하려는 이해관계가 작용하는 것은 아닐지 분석합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Timeline (분석 방법론) -->
+        <div class="slide-container" id="slide3">
+            <h2 class="slide-title">분석 방법론</h2>
+            <div class="content-area" style="padding-top: 40px;">
+                <div class="timeline-layout">
+                    <div class="timeline-line"></div>
+                    
+                    <div class="timeline-item">
+                        <div class="content-wrapper">
+                            <h3>1. 데이터 수집</h3>
+                            <p>네이버 뉴스 크롤링<br>2000~건 (2018~2026년)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="content-wrapper">
+                            <h3>2. 자연어 처리</h3>
+                            <p>바른(Bareun) AI 기반<br>정밀 형태소 및 불용어 처리</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="content-wrapper">
+                            <h3>3. 데이터 활용</h3>
+                            <p>TF-IDF 가중치 추출 &<br>의미 연결망 분석(SNA)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="content-wrapper">
+                            <h3>4. 감성 분석</h3>
+                            <p>서울대 뉴스 특화 감성 모델<br>KR-FinBert-SC 활용</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Table (TF-IDF 분석) -->
+        <div class="slide-container" id="slide4">
+            <h2 class="slide-title">진영별 핵심 키워드 비교 (TF-IDF)</h2>
+            <div class="content-area">
+                <div class="table-layout">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>순위</th>
+                                <th>의료계 담론 핵심어</th>
+                                <th>IT·산업계 담론 핵심어</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1위</td>
+                                <td>치료</td>
+                                <td>산업</td>
+                            </tr>
+                            <tr>
+                                <td>2위</td>
+                                <td>헬스</td>
+                                <td>문화</td>
+                            </tr>
+                            <tr>
+                                <td>3위</td>
+                                <td>문화</td>
+                                <td>콘텐츠</td>
+                            </tr>
+                            <tr>
+                                <td>4위</td>
+                                <td>이해국</td>
+                                <td>규제</td>
+                            </tr>
+                            <tr>
+                                <td>5위</td>
+                                <td>업계</td>
+                                <td>협의체</td>
+                            </tr>
+                            <tr>
+                                <td>6위</td>
+                                <td>사행</td>
+                                <td>경제</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Medical SNA Network (고해상도 완벽 재현) -->
+        <div class="slide-container" id="slide5">
+            <h2 class="slide-title" style="margin-bottom: 20px;">[의료계] 게임 질병코드 담론 의미 연결망 (SNA)</h2>
+            <p style="text-align: left; width: 100%; color: var(--text-muted); margin-bottom: 20px;">
+                뉴스 기사 하단의 카피라이트 텍스트(저작권, 금지 등)가 함께 혼재된 전처리 특성을 포함하여, <br><strong>'코메디닷컴', 'WHO', '세계보건기구'</strong> 등이 병리적 담론의 중심축을 이루고 있음을 시각화했습니다.
+            </p>
+            <div class="content-area">
+                <div class="large-network-container">
+                    <svg viewBox="0 0 1000 500" width="100%" height="100%">
+                        <!-- Edges (Medical) -->
+                        <line class="network-edge" x1="480" y1="200" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="12" /> <!-- 지식-금지 -->
+                        <line class="network-edge" x1="600" y1="250" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="10" /> <!-- 금지-WHO -->
+                        <line class="network-edge" x1="350" y1="220" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="8" /> <!-- 저작권-지식 -->
+                        <line class="network-edge" x1="350" y1="220" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 저작권-금지 -->
+                        <line class="network-edge" x1="600" y1="250" x2="600" y2="150" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 금지-전재 -->
+                        <line class="network-edge" x1="480" y1="200" x2="600" y2="150" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 지식-전재 -->
+                        <line class="network-edge" x1="400" y1="300" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 맹미선-금지 -->
+                        <line class="network-edge" x1="400" y1="300" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 맹미선-지식 -->
+                        <line class="network-edge" x1="400" y1="300" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 맹미선-WHO -->
+                        <line class="network-edge" x1="600" y1="350" x2="800" y2="350" stroke="var(--accent-medical)" stroke-width="6" /> <!-- WHO-세계보건기구 -->
+                        <line class="network-edge" x1="600" y1="250" x2="800" y2="350" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 금지-세계보건기구 -->
+                        <line class="network-edge" x1="200" y1="400" x2="400" y2="300" stroke="var(--accent-medical)" stroke-width="7" /> <!-- 코메디닷컴-맹미선 -->
+                        <line class="network-edge" x1="200" y1="400" x2="350" y2="220" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 코메디닷컴-저작권 -->
+                        <line class="network-edge" x1="200" y1="400" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 코메디닷컴-지식 -->
+                        <line class="network-edge" x1="200" y1="400" x2="600" y2="250" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 코메디닷컴-금지 -->
+                        <line class="network-edge" x1="600" y1="150" x2="800" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 전재-무단 -->
+                        <line class="network-edge" x1="600" y1="250" x2="800" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 금지-무단 -->
+                        <line class="network-edge" x1="480" y1="200" x2="800" y2="200" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 지식-무단 -->
+                        <line class="network-edge" x1="100" y1="250" x2="350" y2="220" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 퀴즈-저작권 -->
+                        <line class="network-edge" x1="100" y1="250" x2="400" y2="300" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 퀴즈-맹미선 -->
+                        <line class="network-edge" x1="100" y1="250" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="4" /> <!-- 퀴즈-지식 -->
+                        <line class="network-edge" x1="200" y1="100" x2="350" y2="220" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 업계-저작권 -->
+                        <line class="network-edge" x1="200" y1="100" x2="480" y2="200" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 업계-지식 -->
+                        <line class="network-edge" x1="580" y1="450" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="6" /> <!-- ICD-WHO -->
+                        <line class="network-edge" x1="580" y1="450" x2="400" y2="300" stroke="var(--accent-medical)" stroke-width="5" /> <!-- ICD-맹미선 -->
+                        <line class="network-edge" x1="900" y1="480" x2="800" y2="350" stroke="var(--accent-medical)" stroke-width="6" /> <!-- 문화-세계보건기구 -->
+                        <line class="network-edge" x1="900" y1="480" x2="600" y2="350" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 문화-WHO -->
+                        <line class="network-edge" x1="900" y1="480" x2="580" y2="450" stroke="var(--accent-medical)" stroke-width="5" /> <!-- 문화-ICD -->
+
+                        <!-- Nodes (Size adjusted based on importance in the provided image) -->
+                        <g class="network-node"><circle cx="480" cy="200" r="34" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="480" y="200">지식</text></g>
+                        <g class="network-node"><circle cx="600" cy="250" r="38" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="600" y="250">금지</text></g>
+                        <g class="network-node"><circle cx="350" cy="220" r="36" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="350" y="220">저작권</text></g>
+                        <g class="network-node"><circle cx="600" cy="150" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="600" y="150">전재</text></g>
+                        <g class="network-node"><circle cx="800" cy="200" r="34" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="800" y="200">무단</text></g>
+                        <g class="network-node"><circle cx="400" cy="300" r="36" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="400" y="300">맹미선</text></g>
+                        <g class="network-node"><circle cx="600" cy="350" r="38" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="600" y="350">WHO</text></g>
+                        <g class="network-node"><circle cx="800" cy="350" r="40" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="800" y="350">세계보건기구</text></g>
+                        <g class="network-node"><circle cx="200" cy="400" r="38" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="200" y="400">코메디닷컴</text></g>
+                        <g class="network-node"><circle cx="100" cy="250" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="100" y="250">퀴즈</text></g>
+                        <g class="network-node"><circle cx="200" cy="100" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="200" y="100">업계</text></g>
+                        <g class="network-node"><circle cx="580" cy="450" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="580" y="450">ICD</text></g>
+                        <g class="network-node"><circle cx="900" cy="480" r="32" fill="var(--accent-medical)" stroke="var(--bg-dark)"/><text x="900" y="480">문화</text></g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: IT SNA Network (고해상도 완벽 재현) -->
+        <div class="slide-container" id="slide6">
+            <h2 class="slide-title" style="margin-bottom: 20px;">[IT/산업계] 게임 질병코드 담론 의미 연결망 (SNA)</h2>
+            <p style="text-align: left; width: 100%; color: var(--text-muted); margin-bottom: 20px;">
+                IT 진영은 <strong>'문화', '산업', '콘텐츠'</strong>를 핵심 가치로 방어하며,<br><strong>'규제', '국회', '관광부'</strong> 등 정책적·제도적 연결망을 촘촘히 구축하고 있습니다.
+            </p>
+            <div class="content-area">
+                <div class="large-network-container">
+                    <svg viewBox="0 0 1000 600" width="100%" height="100%">
+                        <!-- Edges (IT - Pastel Blue) -->
+                        <line class="network-edge" x1="500" y1="240" x2="560" y2="220" stroke="var(--accent-it)" stroke-width="12" /> <!-- 산업-문화 -->
+                        <line class="network-edge" x1="500" y1="240" x2="550" y2="330" stroke="var(--accent-it)" stroke-width="8" /> <!-- 산업-콘텐츠 -->
+                        <line class="network-edge" x1="560" y1="220" x2="550" y2="330" stroke="var(--accent-it)" stroke-width="8" /> <!-- 문화-콘텐츠 -->
+                        <line class="network-edge" x1="500" y1="240" x2="380" y2="320" stroke="var(--accent-it)" stroke-width="10" /> <!-- 산업-WHO -->
+                        <line class="network-edge" x1="560" y1="220" x2="380" y2="320" stroke="var(--accent-it)" stroke-width="5" /> <!-- 문화-WHO -->
+                        <line class="network-edge" x1="380" y1="320" x2="380" y2="250" stroke="var(--accent-it)" stroke-width="8" /> <!-- WHO-세계보건기구 -->
+                        <line class="network-edge" x1="500" y1="240" x2="380" y2="250" stroke="var(--accent-it)" stroke-width="7" /> <!-- 산업-세계보건기구 -->
+                        
+                        <line class="network-edge" x1="560" y1="220" x2="680" y2="130" stroke="var(--accent-it)" stroke-width="7" /> <!-- 문화-국회 -->
+                        <line class="network-edge" x1="500" y1="240" x2="680" y2="130" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-국회 -->
+                        <line class="network-edge" x1="560" y1="220" x2="720" y2="260" stroke="var(--accent-it)" stroke-width="6" /> <!-- 문화-관광부 -->
+                        <line class="network-edge" x1="560" y1="220" x2="620" y2="290" stroke="var(--accent-it)" stroke-width="6" /> <!-- 문화-체육 -->
+                        <line class="network-edge" x1="550" y1="330" x2="620" y2="290" stroke="var(--accent-it)" stroke-width="5" /> <!-- 콘텐츠-체육 -->
+                        <line class="network-edge" x1="500" y1="240" x2="600" y2="90" stroke="var(--accent-it)" stroke-width="6" /> <!-- 산업-규제 -->
+                        <line class="network-edge" x1="560" y1="220" x2="600" y2="90" stroke="var(--accent-it)" stroke-width="5" /> <!-- 문화-규제 -->
+                        
+                        <line class="network-edge" x1="500" y1="240" x2="400" y2="100" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-부정 -->
+                        <line class="network-edge" x1="500" y1="240" x2="500" y2="80" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-여부 -->
+                        <line class="network-edge" x1="560" y1="220" x2="750" y2="180" stroke="var(--accent-it)" stroke-width="5" /> <!-- 문화-대상 -->
+                        <line class="network-edge" x1="750" y1="180" x2="900" y2="160" stroke="var(--accent-it)" stroke-width="4" /> <!-- 대상-인식 -->
+
+                        <line class="network-edge" x1="380" y1="250" x2="300" y2="200" stroke="var(--accent-it)" stroke-width="5" /> <!-- 세계보건기구-게임업계 -->
+                        <line class="network-edge" x1="380" y1="250" x2="400" y2="180" stroke="var(--accent-it)" stroke-width="4" /> <!-- 세계보건기구-ICD -->
+                        <line class="network-edge" x1="380" y1="320" x2="200" y2="270" stroke="var(--accent-it)" stroke-width="4" /> <!-- WHO-업계 -->
+                        <line class="network-edge" x1="380" y1="320" x2="100" y2="420" stroke="var(--accent-it)" stroke-width="4" /> <!-- WHO-정신 -->
+
+                        <line class="network-edge" x1="550" y1="330" x2="550" y2="420" stroke="var(--accent-it)" stroke-width="6" /> <!-- 콘텐츠-금지 -->
+                        <line class="network-edge" x1="500" y1="240" x2="550" y2="420" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-금지 -->
+                        <line class="network-edge" x1="550" y1="420" x2="530" y2="480" stroke="var(--accent-it)" stroke-width="5" /> <!-- 금지-전재 -->
+                        <line class="network-edge" x1="550" y1="420" x2="420" y2="500" stroke="var(--accent-it)" stroke-width="5" /> <!-- 금지-배포 -->
+                        <line class="network-edge" x1="420" y1="500" x2="530" y2="480" stroke="var(--accent-it)" stroke-width="4" /> <!-- 배포-전재 -->
+                        <line class="network-edge" x1="530" y1="480" x2="530" y2="580" stroke="var(--accent-it)" stroke-width="5" /> <!-- 전재-무단 -->
+                        <line class="network-edge" x1="420" y1="500" x2="530" y2="580" stroke="var(--accent-it)" stroke-width="4" /> <!-- 배포-무단 -->
+                        <line class="network-edge" x1="500" y1="240" x2="460" y2="370" stroke="var(--accent-it)" stroke-width="5" /> <!-- 산업-이후 -->
+
+                        <!-- Nodes -->
+                        <g class="network-node"><circle cx="500" cy="240" r="40" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="500" y="240">산업</text></g>
+                        <g class="network-node"><circle cx="560" cy="220" r="38" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="560" y="220">문화</text></g>
+                        <g class="network-node"><circle cx="550" cy="330" r="36" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="550" y="330">콘텐츠</text></g>
+                        <g class="network-node"><circle cx="380" cy="320" r="38" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="380" y="320">WHO</text></g>
+                        <g class="network-node"><circle cx="380" cy="250" r="36" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="380" y="250" font-size="12px">세계보건기구</text></g>
+                        
+                        <g class="network-node"><circle cx="680" cy="130" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="680" y="130">국회</text></g>
+                        <g class="network-node"><circle cx="600" cy="90" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="600" y="90">규제</text></g>
+                        <g class="network-node"><circle cx="720" cy="260" r="34" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="720" y="260">관광부</text></g>
+                        <g class="network-node"><circle cx="620" cy="290" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="620" y="290">체육</text></g>
+                        <g class="network-node"><circle cx="500" cy="80" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="500" y="80">여부</text></g>
+                        <g class="network-node"><circle cx="400" cy="100" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="400" y="100">부정</text></g>
+                        <g class="network-node"><circle cx="750" cy="180" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="750" y="180">대상</text></g>
+                        <g class="network-node"><circle cx="900" cy="160" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="900" y="160">인식</text></g>
+                        
+                        <g class="network-node"><circle cx="300" cy="200" r="34" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="300" y="200">게임업계</text></g>
+                        <g class="network-node"><circle cx="400" cy="180" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="400" y="180">ICD</text></g>
+                        <g class="network-node"><circle cx="200" cy="270" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="200" y="270">업계</text></g>
+                        <g class="network-node"><circle cx="100" cy="420" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="100" y="420">정신</text></g>
+                        
+                        <g class="network-node"><circle cx="550" cy="420" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="550" y="420">금지</text></g>
+                        <g class="network-node"><circle cx="530" cy="480" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="530" y="480">전재</text></g>
+                        <g class="network-node"><circle cx="420" cy="500" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="420" y="500">배포</text></g>
+                        <g class="network-node"><circle cx="530" cy="580" r="32" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="530" y="580">무단</text></g>
+                        <g class="network-node"><circle cx="460" cy="370" r="30" fill="var(--accent-it)" stroke="var(--bg-dark)"/><text x="460" y="370">이후</text></g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Area Chart (시계열 분석) with NEW ANIMATED TOOLTIP -->
+        <div class="slide-container" id="slide7">
+            <h2 class="slide-title">연도별 보도량 분석 (시계열)</h2>
+            <div class="content-area">
+                <div class="area-chart-container">
+                    <!-- 강조된 말풍선 요소 (HTML 기반 애니메이션 적용) -->
+                    <div class="html-tooltip">
+                        <span style="color: var(--accent-medical); font-size: 18px;">확률형 아이템 트럭 시위</span><br>
+                        및 사행성 논란 점화
+                    </div>
+
+                    <svg class="area-chart-svg" viewBox="0 0 1000 350">
+                        <defs>
+                            <linearGradient id="area-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color: var(--accent-it);" stop-opacity="0.4"></stop>
+                                <stop offset="100%" style="stop-color: var(--accent-it);" stop-opacity="0.01"></stop>
+                            </linearGradient>
+                        </defs>
+
+                        <g class="grid">
+                            <line x1="0" y1="300" x2="1000" y2="300"></line>
+                            <line x1="0" y1="0" x2="0" y2="300"></line>
+                        </g>
+                        <g class="grid-dash">
+                            <line x1="0" y1="75" x2="1000" y2="75"></line>
+                            <line x1="0" y1="150" x2="1000" y2="150"></line>
+                            <line x1="0" y1="225" x2="1000" y2="225"></line>
+                            <!-- 2021년 강조 세로 점선 -->
+                            <line x1="375" y1="0" x2="375" y2="300" stroke="var(--accent-medical)" stroke-dasharray="6 6" stroke-width="2"></line>
+                        </g>
+
+                        <path class="area-fill" d="M 0 300 L 0 280 L 125 180 L 250 250 L 375 40 L 500 200 L 625 220 L 750 240 L 875 270 L 1000 280 L 1000 300 Z"></path>
+                        <polyline class="line-stroke" points="0,280 125,180 250,250 375,40 500,200 625,220 750,240 875,270 1000,280"></polyline>
+
+                        <g class="data-points">
+                            <circle class="data-point" cx="0" cy="280" r="5"></circle>
+                            <circle class="data-point" cx="125" cy="180" r="5"></circle>
+                            <circle class="data-point" cx="250" cy="250" r="5"></circle>
+                            <circle class="data-point highlight" cx="375" cy="40" r="8"></circle>
+                            <circle class="data-point" cx="500" cy="200" r="5"></circle>
+                            <circle class="data-point" cx="625" cy="220" r="5"></circle>
+                            <circle class="data-point" cx="750" cy="240" r="5"></circle>
+                            <circle class="data-point" cx="875" cy="270" r="5"></circle>
+                            <circle class="data-point" cx="1000" cy="280" r="5"></circle>
+                        </g>
+
+                        <g class="axis-labels x-axis-labels">
+                            <text x="0" y="330">2018</text>
+                            <text x="125" y="330">2019</text>
+                            <text x="250" y="330">2020</text>
+                            <text x="375" y="330" fill="var(--accent-medical)" font-weight="bold" font-size="16">2021</text>
+                            <text x="500" y="330">2022</text>
+                            <text x="625" y="330">2023</text>
+                            <text x="750" y="330">2024</text>
+                            <text x="875" y="330">2025</text>
+                            <text x="1000" y="330">2026</text>
+                        </g>
+                    </svg>
+                </div>
+                <p style="margin-top: 20px; text-align: center; color: var(--text-main);">WHO 질병코드 등재 시기(2019년)보다 <strong style="color: var(--accent-medical);">2021년</strong>에 보도량이 폭증했습니다.<br>이는 2021년 확률형 아이템 규제 논란을 계기로 게임의 병리화 논의가 강하게 추진되었음을 보여줍니다.</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Stacked Bar Chart (AI 감성 분석) -->
+        <div class="slide-container" id="slide8">
+            <h2 class="slide-title">언론 담론의 온도 차이 (감성 분석)</h2>
+            <div class="content-area">
+                <div class="chart-container">
+                    
+                    <div class="bar">
+                        <div class="label" style="color: var(--accent-medical);">의료계 담론</div>
+                        <div class="bar-inner">
+                            <div class="bar-segment seg-neg" style="width: 60.0%;">부정 60.0%</div>
+                            <div class="bar-segment seg-neu" style="width: 40.0%;">중립 40.0%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar">
+                        <div class="label" style="color: var(--accent-it);">IT/산업계 담론</div>
+                        <div class="bar-inner">
+                            <div class="bar-segment seg-neg" style="width: 17.4%;">17.4%</div>
+                            <div class="bar-segment seg-neu" style="width: 74.7%;">중립 74.7%</div>
+                            <div class="bar-segment seg-pos" style="width: 7.9%;">7.9%</div>
+                        </div>
+                    </div>
+
+                    <div class="custom-legend">
+                        <div><div class="legend-box seg-neg"></div> 부정 편향 </div>
+                        <div><div class="legend-box seg-neu"></div> 중립적 대응 </div>
+                        <div><div class="legend-box seg-pos"></div> 긍정 편향 </div>
+                    </div>
+
+                </div>
+                <p style="margin-top: 30px; text-align: center; color: var(--text-main); line-height: 1.8; background: var(--bg-panel); padding: 20px 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    감성 분석 결과 의료계는 <strong style="color: var(--accent-medical);">긍정적인 담론이 없음</strong>을 알 수 있습니다.<br>
+                    의료계는 높은 <strong style="color: var(--accent-medical);">부정 편향(60%)</strong>으로 문제의 심각성을 강하게 주장하는 반면,<br>
+                    IT계는 상대적으로 건조하고 <strong style="color: var(--text-muted);">중립적(74.7%)</strong>인 방어 및 제도적 대응에 치중하고 있습니다.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Conclusion -->
+        <div class="slide-container" id="slide9">
+            <h2 class="slide-title">결론 및 시사점</h2>
+            <div class="content-area">
+                <div class="two-column tiled">
+                    <div>
+                        <h3 style="color: var(--accent-medical);"><i class="fa-solid fa-microscope" style="margin-right: 10px;"></i>데이터 시사점</h3>
+                        <p>게임 질병코드 담론은 순수한 의학적·보건적 차원을 넘어섰습니다.</p>
+                        <p>데이터가 보여주듯, 이는 게임을 특정 의도에 따라 <strong style="color: var(--text-main);">병리화하려는 프레임</strong>과, 게임의 <strong style="color: var(--text-main);">문화적·산업적 가치를 방어하려는 진영</strong> 간의 복합적 이해관계가 치열하게 대립하는 현장을 알 수 있습니다.</p>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--accent-it);"><i class="fa-solid fa-lightbulb" style="margin-right: 10px;"></i>나의 의견</h3>
+                        <p>현재는 이미 불씨가 꺼져 잔잔한 상태지만 아직도 게임을 질병화하려는 움직임이 많습니다.</p>
+                        <p>현실 세계의 건강한 게임 문화 조성과 진짜 병을 가진 사람들의 치료를 위해, 병리화를 통한 이익 추구가 아닌 <strong style="color: var(--text-main);">그저 정신적인 치료가 필요한 사람</strong>으로 생각하여 실효성 있는 치료 체계를 잡을 필요가 있다고 생각합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Q&A -->
+        <div class="slide-container" id="slide10">
+            <div class="qa-layout">
+                <h2>Q&A</h2>
+                <p>경청해 주셔서 감사합니다.</p>
+            </div>
+        </div>
+
+    </div> <!-- End Presentation Area -->
+
+    <!-- 발표 컨트롤러 (네비게이션) -->
+    <div id="presentation-controls">
+        <button class="control-btn" id="btn-prev" title="이전 (왼쪽 화살표)" onclick="prevSlide()">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <span id="slide-counter">1 / 10</span>
+        <button class="control-btn" id="btn-next" title="다음 (오른쪽 화살표/스페이스)" onclick="nextSlide()">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.2); margin: 0 10px;"></div>
+        <button class="control-btn" id="btn-fullscreen" title="전체화면 전환 (F)" onclick="toggleFullScreen()">
+            <i class="fa-solid fa-expand"></i>
+        </button>
+    </div>
+
+    <!-- Presentation Javascript -->
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide-container');
+        const totalSlides = slides.length;
+        const counterEl = document.getElementById('slide-counter');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const area = document.getElementById('presentation-area');
+
+        // 강력한 리사이즈 보정: 항상 화면 중앙에 1280x720 픽셀을 비율대로 배치
+        function resizePresentation() {
+            if (window.matchMedia('print').matches) return;
+
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
+            const targetW = 1280;
+            const targetH = 720;
+
+            const scale = Math.min(winW / targetW, winH / targetH);
+            
+            const scaledW = targetW * scale;
+            const scaledH = targetH * scale;
+            
+            const left = (winW - scaledW) / 2;
+            const top = (winH - scaledH) / 2;
+            
+            area.style.transform = `scale(${scale})`;
+            area.style.left = `${left}px`;
+            area.style.top = `${top}px`;
+        }
+
+        // 슬라이드 업데이트
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if(index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            
+            counterEl.innerText = `${currentSlide + 1} / ${totalSlides}`;
+            btnPrev.disabled = (currentSlide === 0);
+            btnNext.disabled = (currentSlide === totalSlides - 1);
+        }
+
+        // 다음 / 이전 함수
+        function nextSlide() {
+            if(currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+        function prevSlide() {
+            if(currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // 전체화면 토글
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // 전체화면 아이콘 변경 로직
+        document.addEventListener('fullscreenchange', () => {
+            const fsIcon = document.querySelector('#btn-fullscreen i');
+            if (document.fullscreenElement) {
+                fsIcon.classList.remove('fa-expand');
+                fsIcon.classList.add('fa-compress');
+            } else {
+                fsIcon.classList.remove('fa-compress');
+                fsIcon.classList.add('fa-expand');
+            }
+            setTimeout(resizePresentation, 100);
+        });
+
+        // 단축키
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowRight' || e.key === 'Space' || e.key === ' ' || e.key === 'Enter' || e.key === 'PageDown') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullScreen();
+            }
+        });
+
+        // 빈 화면 클릭 (컨트롤러 영역 클릭 방해 방지용)
+        area.addEventListener('click', (e) => { nextSlide(); });
+
+        // 초기화 및 리스너 등록
+        window.addEventListener('resize', resizePresentation);
+        
+        setTimeout(() => {
+            resizePresentation();
+            updateSlide();
+        }, 50);
+
+        // 모바일 터치 스와이프
+        let touchstartX = 0, touchendX = 0;
+        document.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
+        document.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            if (touchendX < touchstartX - 50) nextSlide();
+            if (touchendX > touchstartX + 50) prevSlide();
+        }, {passive: true});
+
+    </script>
+</body>
+</html>
